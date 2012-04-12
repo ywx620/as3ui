@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnableComponent xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					  xmlns:s="library://ns.adobe.com/flex/spark" 
+					  xmlns:mx="library://ns.adobe.com/flex/mx" 
+					  width="113" height="22" >
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+	<fx:Metadata>
+		[Event(name="change", type="com.colintrinity.spark.event.PaginateEvent")]
+	</fx:Metadata>
+	<fx:Script>
+		<![CDATA[
+			import com.colintrinity.spark.event.PaginateEvent;
+			
+			import spark.components.Button;
+			import spark.components.TextInput;
+
+			[SkinPart(required="true")]
+			public var firstButton:Button;
+			[SkinPart(required="true")]
+			public var previousButton:Button;
+			[SkinPart(required="true")]
+			public var nextButton:Button;
+			[SkinPart(required="true")]
+			public var lastButton:Button;
+			[SkinPart(required="true")]
+			public var pageDisplay:TextInput;
+			
+			
+			private var _max:uint = 0;
+			private var _current:uint = 0;
+			
+			public function set maxPage(value:uint):void {
+				_max = value;
+				invalidateProperties();
+			}
+			
+			public function get maxPage():uint {
+				return _max;
+			}
+			
+			[Bindable]
+			public function set currentPage(value:uint):void {
+				if(_current == value) {
+					return;
+				}
+				
+				var oldPage:uint = _current;
+				_current = value;
+				var event:PaginateEvent = new PaginateEvent(PaginateEvent.CHANGE)
+				event.oldPage = oldPage;
+				event.newPage = value;
+				dispatchEvent(event);
+				
+				invalidateProperties();
+			}
+			
+			public function get currentPage():uint {
+				return _current;
+			}
+			
+			override protected function partAdded(partName:String, instance:Object):void {
+				
+				if( instance == firstButton) {
+					firstButton.addEventListener(MouseEvent.CLICK, firstButtonClickHandler);
+				}
+
+				if( instance == previousButton) {
+					previousButton.addEventListener(MouseEvent.CLICK, previousButtonClickHandler);
+				}
+				
+				if( instance == nextButton) {
+					nextButton.addEventListener(MouseEvent.CLICK, nextButtonClickHandler);
+				}
+				
+				if( instance == lastButton) {
+					lastButton.addEventListener(MouseEvent.CLICK, lastButtonClickHandler);
+				}
+				
+				if( instance == pageDisplay ) {
+					pageDisplay.text = _current + '/' + _max;
+				}
+				
+				if(instance == pageDisplay) {
+					pageDisplay.text = _current + '/' + _max;
+				}
+				
+				
+				super.partAdded(partName,instance);
+			}
+			
+			protected function firstButtonClickHandler(e:MouseEvent):void {
+				if(currentPage != 1 ) {
+					var event:PaginateEvent = new PaginateEvent(PaginateEvent.HOME)
+					event.oldPage = currentPage;
+					event.newPage = 1;
+					currentPage = 1;
+					dispatchEvent(event);
+				}
+			}
+			
+			protected function previousButtonClickHandler(e:MouseEvent):void {
+				if(currentPage>1) {
+					var event:PaginateEvent = new PaginateEvent(PaginateEvent.PREVIOUS)
+					event.oldPage = currentPage;
+					event.newPage = currentPage--;
+					dispatchEvent(event);
+				}
+			}
+			
+			protected function nextButtonClickHandler(e:MouseEvent):void {
+				if(currentPage<maxPage) {
+					var event:PaginateEvent = new PaginateEvent(PaginateEvent.NEXT)
+					event.oldPage = currentPage;
+					event.newPage = currentPage++;
+					dispatchEvent(event);
+				}
+			}
+			
+			protected function lastButtonClickHandler(e:MouseEvent):void {
+				if(currentPage != maxPage ) {
+					var event:PaginateEvent = new PaginateEvent(PaginateEvent.END)
+					event.oldPage = currentPage;
+					event.newPage = maxPage;
+					currentPage = maxPage;
+					dispatchEvent(event);
+				}
+			}
+			
+			override protected function commitProperties():void {
+				super.commitProperties();
+				
+				if(pageDisplay) {
+					pageDisplay.text = _current + '/' + _max;
+				}
+				
+			}
+		]]>
+	</fx:Script>
+</s:SkinnableComponent>

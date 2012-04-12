@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnableComponent xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					  xmlns:s="library://ns.adobe.com/flex/spark" 
+					  xmlns:mx="library://ns.adobe.com/flex/mx"  >
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.IList;
+			
+			import spark.components.Button;
+			import spark.components.DataGroup;
+			import spark.components.Image;
+			import spark.events.IndexChangeEvent;
+			
+			[SkinPart(required="true")]
+			public var imageDisplay:spark.components.Image;
+			
+			[SkinPart(required="true")]
+			public var previousButton:Button;
+			
+			[SkinPart(required="true")]
+			public var nextButton:Button;
+			
+			private var _selectIndex:uint = 0;
+			
+			private var dataGroup:DataGroup = new DataGroup();
+			
+			public function get selectIndex():uint
+			{
+				return _selectIndex;
+			}
+
+			public function set selectIndex(value:uint):void
+			{
+				if(_selectIndex != value) {
+					dispatchEvent(new IndexChangeEvent(IndexChangeEvent.CHANGE,false,false,_selectIndex,value));
+				}
+				
+				_selectIndex = value;
+				
+				var item:Object =  dataProvider.getItemAt(selectIndex);
+				
+				if(item && item.url) {
+					imageDisplay.source = item.url;
+				}
+				
+			}
+			
+			public function get selectItem():Object
+			{
+				if(dataProvider) {
+					return dataProvider.getItemAt(selectIndex);
+				}
+				
+				return null;
+			}
+			
+
+			public function get dataProvider():IList {
+				return dataGroup.dataProvider;
+			}
+			
+			
+			public function set dataProvider(value:IList):void {
+				if(dataGroup.dataProvider == value) {
+					return;
+				}
+				
+				dataGroup.dataProvider = value;
+				
+				selectIndex = 0;
+			}
+			
+			override protected function partAdded(partName:String, instance:Object):void {
+				
+				if(instance == previousButton) {
+					previousButton.addEventListener(MouseEvent.CLICK, previousButtonClickHandler);
+				}
+				
+				if( instance == nextButton ) {
+					nextButton.addEventListener(MouseEvent.CLICK, nextButtonClickHandler);
+				}
+				
+				if( instance == imageDisplay && dataProvider ) {
+					var item:Object =  dataProvider.getItemAt(selectIndex);
+					if(item && item.url) {
+						imageDisplay.source = item.url;
+					}
+				}
+				
+				super.partAdded(partName,instance);
+			}
+			
+			protected function previousButtonClickHandler(event:MouseEvent):void
+			{
+				if(dataProvider && selectIndex>0) {
+					selectIndex--;
+				}
+			}
+			
+			protected function nextButtonClickHandler(event:MouseEvent):void
+			{
+				if(dataProvider && selectIndex < dataProvider.length - 1) {
+					selectIndex++;
+				}
+			}
+		]]>
+	</fx:Script>
+</s:SkinnableComponent>

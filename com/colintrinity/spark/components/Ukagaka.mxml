@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnableComponent xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					  xmlns:s="library://ns.adobe.com/flex/spark" 
+					  xmlns:mx="library://ns.adobe.com/flex/mx" 
+					  currentState="normal">
+	<fx:Script>
+		<![CDATA[
+			import com.adobe.utils.StringUtil;
+			import mx.controls.Image;
+			import spark.components.RichEditableText;
+			
+			[SkinPart(required="true")]
+			public var imageDisplay:Image;
+			
+			[SkinPart(required="true")]
+			public var textDisplay:RichEditableText;
+			
+			private var _source:Object;
+			private var _text:String;
+			
+			public function get text():String
+			{
+				return _text;
+			}
+
+			public function set text(value:String):void
+			{
+				_text = value;
+				
+				if(textDisplay) {
+					textDisplay.text = text;
+					textDisplay.invalidateSize();
+					invalidateSkinState();
+				}
+			}
+
+			public function get source():Object
+			{
+				return _source;
+			}
+
+			public function set source(value:Object):void
+			{
+				_source = value;
+				
+				if(imageDisplay) {
+					imageDisplay.source = source;
+				}
+			}
+
+			override protected function partAdded(partName:String, instance:Object):void {
+				
+				if( instance == imageDisplay) {
+					imageDisplay.source = source;
+					
+				}
+				
+				if( instance == textDisplay) {
+					textDisplay.editable = false;
+					textDisplay.text = text;
+					textDisplay.invalidateSize();
+					invalidateSkinState();
+				}
+				
+				super.partAdded(partName,instance);
+			}
+			
+			override public function set visible(value:Boolean):void {
+				currentState = value?'normal':'hide';
+				
+				invalidateSize()
+				invalidateDisplayList();
+				invalidateSkinState();
+			}
+			
+			override public function get visible():Boolean {
+				return currentState == 'normal';
+			}
+			
+			override protected function getCurrentSkinState():String {
+				var flag:Boolean = textDisplay&&textDisplay.text&&(StringUtil.trim(textDisplay.text) != '');
+				return currentState + (flag?"WithDialog":'');
+			}
+			
+			override protected function createChildren():void {
+				super.createChildren();
+				callLater(hide);
+			}
+			
+			private function hide():void {
+				visible = false;
+			}
+		]]>
+	</fx:Script>
+	<s:states>
+		<s:State name="normal" />
+		<s:State name="hide" />
+	</s:states>
+</s:SkinnableComponent>

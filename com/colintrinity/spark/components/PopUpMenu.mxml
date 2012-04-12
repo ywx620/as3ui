@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnableComponent xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					  xmlns:s="library://ns.adobe.com/flex/spark" 
+					  xmlns:mx="library://ns.adobe.com/flex/mx">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.IList;
+			
+			import spark.components.DataGroup;
+			
+			[SkinPart(required="true")]
+			public var menuDataGroup:DataGroup;
+			
+			private var properties:Object = {};
+			
+			public function get dataProvider():IList {
+				if(menuDataGroup) {
+					return menuDataGroup.dataProvider;
+				}
+				
+				var v:* = properties.dataProvider;
+				return (v === undefined) ? null : v;
+			}
+			
+			/**
+			 * 
+			 * 设置相关头像的数据
+			 * 
+			 * 格式例子：
+			 * 		new ArrayCollection([{url:'text1.jpg'},{url:'text2.jpg'}])
+			 * 格式说明：
+			 * 		url：角色名
+			 * 
+			 */ 
+			public function set dataProvider(value:IList):void {
+				if (menuDataGroup)
+				{
+					menuDataGroup.dataProvider = value;
+				}
+				else
+				{
+					properties.dataProvider = value;
+				}
+				
+				// Generate an UPDATE_COMPLETE event.
+				invalidateProperties(); 
+			}
+			
+			override protected function partAdded(partName:String, instance:Object):void {
+				
+				if( instance == menuDataGroup) {
+					menuDataGroup.dataProvider = properties.dataProvider;
+				}
+				
+				super.partAdded(partName,instance);
+			}
+		]]>
+	</fx:Script>
+</s:SkinnableComponent>
